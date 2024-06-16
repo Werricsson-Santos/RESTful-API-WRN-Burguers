@@ -15,7 +15,7 @@ public class Product {
     private Long id;
     private String name;
     
-    @Column(scale = 2, precision = 2)
+    @Column(precision = 2, scale = 2)
     private BigDecimal price;
 
     // Getters and Setters
