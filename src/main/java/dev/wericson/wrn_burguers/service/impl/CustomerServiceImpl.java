@@ -1,5 +1,7 @@
 package dev.wericson.wrn_burguers.service.impl;
 
+import static java.util.Optional.ofNullable;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.wericson.wrn_burguers.domain.model.Customer;
 import dev.wericson.wrn_burguers.domain.repository.CustomerRepository;
 import dev.wericson.wrn_burguers.service.CustomerService;
+import dev.wericson.wrn_burguers.service.exception.BusinessException;
 import dev.wericson.wrn_burguers.service.exception.NotFoundException;
 
 @Service
@@ -32,9 +35,14 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public Customer create(Customer entity) {
-		// TODO Auto-generated method stub
-		return null;
+	public Customer create(Customer customerToCreate) {
+		ofNullable(customerToCreate).orElseThrow(() -> new BusinessException("Customer to create must have an CPF."));
+		
+		if(customerRepository.existsByCpfNumber(customerToCreate.getCPF())) {
+			throw new BusinessException("This CPF number already exists. Customer to create must have an unique CPF.");
+		}
+		
+		return this.customerRepository.save(customerToCreate);
 	}
 
 	@Override
