@@ -2,6 +2,9 @@ package dev.wericson.wrn_burguers.domain.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,11 +20,16 @@ public class Product {
 
     @Column(precision = 4, scale = 2)
     private BigDecimal price;
-
-    public Product(String name, BigDecimal price) {
-		this.name = name;
-		this.price = price;
-	}
+    
+    public Product() {
+    	
+    }
+    
+    @JsonCreator
+    public Product(@JsonProperty("name") String name, @JsonProperty("price") BigDecimal price) {
+        this.name = name;
+        this.price = price;
+    }
 
 	// Getters and Setters
     public Long getId() {
