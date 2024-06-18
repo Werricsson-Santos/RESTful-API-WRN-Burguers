@@ -23,6 +23,10 @@ public class Customer {
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Order> orders;
+	
+	public Customer() {
+		
+	}
 
     // Getters and Setters
     public Long getId() {
