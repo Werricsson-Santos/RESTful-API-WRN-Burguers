@@ -57,9 +57,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional
 	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
+		Product dbProduct = this.findById(id);
+		this.productRepository.delete(dbProduct);
 	}
 
 }
