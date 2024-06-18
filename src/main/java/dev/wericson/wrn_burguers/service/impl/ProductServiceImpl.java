@@ -47,12 +47,15 @@ public class ProductServiceImpl implements ProductService {
 	@Transactional
 	public Product update(Long id, Product productToUpdate) {
 		Product dbProduct = this.findById(id);
+		productToUpdate.setId(id);
 		if (!dbProduct.getId().equals(productToUpdate.getId())) {
 			throw new BusinessException("Update IDs must be the same.");
 		}
 		
-		dbProduct.setName(productToUpdate.getName());
-		dbProduct.setPrice(productToUpdate.getPrice());
+		if(productToUpdate.getName() != null)
+			dbProduct.setName(productToUpdate.getName());
+		if(productToUpdate.getPrice() != null)
+			dbProduct.setPrice(productToUpdate.getPrice());
 		return this.productRepository.save(dbProduct);
 	}
 
