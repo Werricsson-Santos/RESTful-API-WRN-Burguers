@@ -35,7 +35,8 @@ public class ProductServiceImpl implements ProductService {
 	public Product create(Product productToCreate) {
 		ofNullable(productToCreate.getName()).orElseThrow(() -> new BusinessException("Product to create must have a name."));
 		ofNullable(productToCreate.getPrice()).orElseThrow(() -> new BusinessException("Product to create must have a price."));
-		return null;
+		
+		return this.productRepository.save(productToCreate);
 	}
 
 	@Override
