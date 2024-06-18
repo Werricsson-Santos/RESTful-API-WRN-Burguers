@@ -17,10 +17,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    
+
     @Column(unique = true)
-    private String CPF;
-    
+    private String cpf;
+
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Order> orders;
 
@@ -40,13 +40,13 @@ public class Customer {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getCPF() {
-		return CPF;
+		return cpf;
 	}
 
 	public void setCPF(String cPF) {
-		CPF = cPF;
+		cpf = cPF;
 	}
 
 
