@@ -15,7 +15,7 @@ public class Product {
     private Long id;
     private String name;
 
-    @Column(precision = 2, scale = 2)
+    @Column(precision = 4, scale = 2)
     private BigDecimal price;
 
     public Product(String name, BigDecimal price) {
