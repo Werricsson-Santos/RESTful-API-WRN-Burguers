@@ -9,15 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import dev.wericson.wrn_burguers.domain.model.Customer;
 import dev.wericson.wrn_burguers.domain.repository.CustomerRepository;
+import dev.wericson.wrn_burguers.dto.CustomerDTO;
 import dev.wericson.wrn_burguers.service.CustomerService;
 import dev.wericson.wrn_burguers.service.exception.BusinessException;
 import dev.wericson.wrn_burguers.service.exception.NotFoundException;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-	
+
 	private final CustomerRepository customerRepository;
-	
+
 	public CustomerServiceImpl(CustomerRepository customerRepository) {
 		this.customerRepository = customerRepository;
 	}
@@ -35,26 +36,46 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
+	@Transactional
 	public Customer create(Customer customerToCreate) {
 		ofNullable(customerToCreate).orElseThrow(() -> new BusinessException("Customer to create must have an CPF."));
-		
-		if(customerRepository.existsByCpfNumber(customerToCreate.getCPF())) {
+
+		if(customerRepository.existsByCpf(customerToCreate.getCPF())) {
 			throw new BusinessException("This CPF number already exists. Customer to create must have an unique CPF.");
 		}
-		
+
 		return this.customerRepository.save(customerToCreate);
 	}
 
 	@Override
-	public Customer update(Long id, Customer entity) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional
+	public Customer update(Long id, Customer customerToUpdate) {
+		Customer dbCustomer = this.findById(id);
+		if (!dbCustomer.getId().equals(customerToUpdate.getId())) {
+			throw new BusinessException("Update IDs must be the same.");
+		}
+
+		dbCustomer.setName(customerToUpdate.getName());
+		dbCustomer.setCPF(customerToUpdate.getCPF());
+		dbCustomer.setOrders(customerToUpdate.getOrders());
+		return this.customerRepository.save(dbCustomer);
 	}
 
 	@Override
+	@Transactional
 	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
+		Customer dbCustomer = this.findById(id);
+		this.customerRepository.delete(dbCustomer);
+	}
+
+	@Override
+	public CustomerDTO convertToDTO(Customer customerToConvert) {
+		CustomerDTO customerDTO = new CustomerDTO();
+		customerDTO.setId(customerToConvert.getId());
+		customerDTO.setName(customerToConvert.getName());
+		customerDTO.setOrders(customerToConvert.getOrders());
+
+		return customerDTO;
 	}
 
 }
