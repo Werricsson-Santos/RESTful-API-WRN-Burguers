@@ -14,11 +14,16 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    
+
     @Column(precision = 2, scale = 2)
     private BigDecimal price;
 
-    // Getters and Setters
+    public Product(String name, BigDecimal price) {
+		this.name = name;
+		this.price = price;
+	}
+
+	// Getters and Setters
     public Long getId() {
         return id;
     }
