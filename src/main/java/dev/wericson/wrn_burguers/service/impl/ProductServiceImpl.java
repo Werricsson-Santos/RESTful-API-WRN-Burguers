@@ -23,16 +23,19 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Product> findAll() {
 		return this.productRepository.findAll();
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Product findById(Long id) {
 		return this.productRepository.findById(id).orElseThrow(NotFoundException::new);
 	}
 
 	@Override
+	@Transactional
 	public Product create(Product productToCreate) {
 		ofNullable(productToCreate.getName()).orElseThrow(() -> new BusinessException("Product to create must have a name."));
 		ofNullable(productToCreate.getPrice()).orElseThrow(() -> new BusinessException("Product to create must have a price."));
