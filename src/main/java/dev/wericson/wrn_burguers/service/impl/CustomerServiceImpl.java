@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.wericson.wrn_burguers.domain.model.Customer;
-import dev.wericson.wrn_burguers.domain.model.Order;
 import dev.wericson.wrn_burguers.domain.repository.CustomerRepository;
 import dev.wericson.wrn_burguers.service.CustomerService;
 import dev.wericson.wrn_burguers.service.exception.BusinessException;
@@ -38,7 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	@Transactional
 	public Customer create(Customer customerToCreate) {
-		ofNullable(customerToCreate.getName()).orElseThrow(() -> new BusinessException("Customer to create must have a name."));
+		ofNullable(customerToCreate.getName()).orElseThrow(() -> new BusinessException("Customer to create must have a Name."));
 		ofNullable(customerToCreate.getCPF()).orElseThrow(() -> new BusinessException("Customer to create must have an CPF."));
 
 		if(customerRepository.existsByCpf(customerToCreate.getCPF())) {
@@ -63,16 +62,6 @@ public class CustomerServiceImpl implements CustomerService {
 			dbCustomer.setCPF(customerToUpdate.getCPF());
 		dbCustomer.setOrders(customerToUpdate.getOrders());
 		return this.customerRepository.save(dbCustomer);
-	}
-	
-	public Order makeOrder(Long id, Customer customerToMakeOrder) {
-		Customer dbCustomer = this.findById(id);
-		customerToMakeOrder.setId(id);
-		
-		if(customerToMakeOrder.getOrders() != null) {
-			Order newOrder = Order(customerToMakeOrder.getOrders().stream().findFirst().orElseThrow());
-			dbCustomer.setOrders(null);
-		}
 	}
 
 	@Override
