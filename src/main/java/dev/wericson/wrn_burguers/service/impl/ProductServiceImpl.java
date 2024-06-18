@@ -5,6 +5,7 @@ import static java.util.Optional.ofNullable;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dev.wericson.wrn_burguers.domain.model.Product;
 import dev.wericson.wrn_burguers.domain.repository.ProductRepository;
@@ -40,9 +41,16 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public Product update(Long id, Product entity) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional
+	public Product update(Long id, Product productToUpdate) {
+		Product dbProduct = this.findById(id);
+		if (!dbProduct.getId().equals(productToUpdate.getId())) {
+			throw new BusinessException("Update IDs must be the same.");
+		}
+		
+		dbProduct.setName(productToUpdate.getName());
+		dbProduct.setPrice(productToUpdate.getPrice());
+		return this.productRepository.save(dbProduct);
 	}
 
 	@Override
