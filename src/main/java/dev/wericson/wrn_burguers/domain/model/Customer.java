@@ -1,5 +1,6 @@
 package dev.wericson.wrn_burguers.domain.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -21,8 +22,8 @@ public class Customer {
     @Column(unique = true)
     private String cpf;
 
-	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Order> orders;
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
 	
 	public Customer() {
 		
@@ -60,6 +61,14 @@ public class Customer {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+    
+    public void addOrder(Order order) {
+    	this.orders.add(order);
+    }
+    
+    public void removeOrder(Order order) {
+    	this.orders.remove(order);
     }
 }
 
