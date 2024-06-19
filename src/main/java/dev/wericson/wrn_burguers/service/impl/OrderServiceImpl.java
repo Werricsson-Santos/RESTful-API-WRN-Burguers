@@ -1,11 +1,16 @@
 package dev.wericson.wrn_burguers.service.impl;
 
+import static java.util.Optional.ofNullable;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import dev.wericson.wrn_burguers.domain.model.Order;
+import dev.wericson.wrn_burguers.domain.model.Product;
 import dev.wericson.wrn_burguers.domain.repository.CustomerRepository;
 import dev.wericson.wrn_burguers.domain.repository.OrderRepository;
 import dev.wericson.wrn_burguers.service.OrderService;
+import dev.wericson.wrn_burguers.service.exception.BusinessException;
 import dev.wericson.wrn_burguers.service.exception.NotFoundException;
 
 public class OrderServiceImpl implements OrderService {
@@ -33,20 +38,46 @@ public class OrderServiceImpl implements OrderService {
 		ofNullable(orderToCreate.getCustomer().getId()).orElseThrow(() -> new BusinessException("To make an order is necessary 1 customer ID."));
 		ofNullable(orderToCreate.getProducts()).orElseThrow(() -> new BusinessException("To make an order is necessary add at least 1 product."));
 		
-		if()
-		return null;
+		if(!customerRepository.existsById(orderToCreate.getCustomer().getId())) {
+			throw new BusinessException("Customer not found. To make an order you must have specify a customer by ID.");
+		}
+		var bdCustomer = customerRepository.findById(orderToCreate.getCustomer().getId());
+		List<Order> customerOrders = bdCustomer.get().getOrders();
+		customerOrders.add(orderToCreate);
+		
+		return this.orderRepository.save(orderToCreate);
 	}
 
 	@Override
-	public Order update(Long id, Order entity) {
-		// TODO Auto-generated method stub
-		return null;
+	public Order update(Long id, Order orderToUpdate) {
+		ofNullable(orderToUpdate.getId()).orElseThrow(() -> new BusinessException("Order to update must have an ID."));
+		
+		Order bdOrder = this.orderRepository.findById(id).orElseThrow(NotFoundException::new);
+		orderToUpdate.setId(bdOrder.getId());
+		
+		if(orderToUpdate.getProducts().isEmpty()) {
+			throw new BusinessException("Order to update must have at least 1 product.");
+		}
+		
+		bdOrder.setProducts(orderToUpdate.getProducts());
+		bdOrder.setTotalAmount(orderToUpdate.getProducts().stream().map(Product::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+		
+		if(bdOrder.isPaid() != orderToUpdate.isPaid())
+			bdOrder.setPaid(orderToUpdate.isPaid());
+		
+		if(bdOrder.isDelivered() != orderToUpdate.isDelivered())
+			bdOrder.setDelivered(orderToUpdate.isDelivered());
+		
+		if(bdOrder.isOrderCompleted() != orderToUpdate.isOrderCompleted())
+			bdOrder.setOrderCompleted(orderToUpdate.isOrderCompleted());
+		
+		return this.orderRepository.save(bdOrder);
 	}
 
 	@Override
 	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
+		Order bdOrder = this.orderRepository.findById(id).orElseThrow(NotFoundException::new);
+		this.orderRepository.delete(bdOrder);
 	}
 
 }
