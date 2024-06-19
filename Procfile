@@ -1,0 +1,1 @@
+web: java -jar build/libs/wrn-burguers-0.0.1-SNAPSHOT.jar
