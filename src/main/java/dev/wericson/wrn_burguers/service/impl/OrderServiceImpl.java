@@ -5,6 +5,8 @@ import static java.util.Optional.ofNullable;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import dev.wericson.wrn_burguers.domain.model.Order;
 import dev.wericson.wrn_burguers.domain.model.Product;
 import dev.wericson.wrn_burguers.domain.repository.CustomerRepository;
@@ -13,6 +15,7 @@ import dev.wericson.wrn_burguers.service.OrderService;
 import dev.wericson.wrn_burguers.service.exception.BusinessException;
 import dev.wericson.wrn_burguers.service.exception.NotFoundException;
 
+@Service
 public class OrderServiceImpl implements OrderService {
 	
 	private final OrderRepository orderRepository;
