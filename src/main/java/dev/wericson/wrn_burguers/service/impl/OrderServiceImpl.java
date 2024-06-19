@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import dev.wericson.wrn_burguers.domain.model.Customer;
 import dev.wericson.wrn_burguers.domain.model.Order;
 import dev.wericson.wrn_burguers.domain.model.Product;
 import dev.wericson.wrn_burguers.domain.repository.CustomerRepository;
@@ -46,6 +47,9 @@ public class OrderServiceImpl implements OrderService {
 		}
 		var bdCustomer = customerRepository.findById(orderToCreate.getCustomer().getId());
 		List<Order> customerOrders = bdCustomer.get().getOrders();
+		
+		if(orderToCreate.getTotalAmount() == null)
+			orderToCreate.setTotalAmount(orderToCreate.getProducts().stream().map(Product::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
 		customerOrders.add(orderToCreate);
 		
 		return this.orderRepository.save(orderToCreate);
@@ -53,8 +57,6 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order update(Long id, Order orderToUpdate) {
-		ofNullable(orderToUpdate.getId()).orElseThrow(() -> new BusinessException("Order to update must have an ID."));
-		
 		Order bdOrder = this.orderRepository.findById(id).orElseThrow(NotFoundException::new);
 		orderToUpdate.setId(bdOrder.getId());
 		
@@ -80,7 +82,16 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void delete(Long id) {
 		Order bdOrder = this.orderRepository.findById(id).orElseThrow(NotFoundException::new);
-		this.orderRepository.delete(bdOrder);
+		Customer bdCustomer = bdOrder.getCustomer();
+		
+		if(bdCustomer != null) {
+			bdCustomer.removeOrder(bdOrder);
+			bdOrder.setCustomer(null);
+			customerRepository.save(bdCustomer);
+		}
+		
+		bdOrder.setProducts(null);
+		this.orderRepository.deleteById(id);
 	}
 
 }
