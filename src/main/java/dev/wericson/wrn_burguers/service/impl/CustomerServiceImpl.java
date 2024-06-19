@@ -15,6 +15,12 @@ import dev.wericson.wrn_burguers.service.exception.NotFoundException;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
+	
+	/**
+     * ID de cliente com o meu nome.
+     * Por isso, vamos criar algumas regras para mantê-lo integro.
+     */
+    private static final Long UNCHANGEABLE_CUSTOMER_ID = 1L;
 
 	private final CustomerRepository customerRepository;
 
@@ -39,6 +45,8 @@ public class CustomerServiceImpl implements CustomerService {
 	public Customer create(Customer customerToCreate) {
 		ofNullable(customerToCreate.getName()).orElseThrow(() -> new BusinessException("Customer to create must have a Name."));
 		ofNullable(customerToCreate.getCPF()).orElseThrow(() -> new BusinessException("Customer to create must have an CPF."));
+		
+		this.validateChangeableId(customerToCreate.getId(), "created");
 
 		if(customerRepository.existsByCpf(customerToCreate.getCPF())) {
 			throw new BusinessException("This CPF number already exists. Customer to create must have an unique CPF.");
@@ -50,6 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	@Transactional
 	public Customer update(Long id, Customer customerToUpdate) {
+		this.validateChangeableId(id, "updated");
 		Customer dbCustomer = this.findById(id);
 		customerToUpdate.setId(id);
 		if (!dbCustomer.getId().equals(customerToUpdate.getId())) {
@@ -60,15 +69,23 @@ public class CustomerServiceImpl implements CustomerService {
 			dbCustomer.setName(customerToUpdate.getName());
 		if(customerToUpdate.getCPF() != null)
 			dbCustomer.setCPF(customerToUpdate.getCPF());
-		dbCustomer.setOrders(customerToUpdate.getOrders());
+		if(customerToUpdate.getOrders() != null && !customerToUpdate.getOrders().isEmpty())
+			dbCustomer.setOrders(customerToUpdate.getOrders());
 		return this.customerRepository.save(dbCustomer);
 	}
 
 	@Override
 	@Transactional
 	public void delete(Long id) {
+		this.validateChangeableId(id, "deleted");
 		Customer dbCustomer = this.findById(id);
 		this.customerRepository.delete(dbCustomer);
 	}
+	
+	private void validateChangeableId(Long id, String operation) {
+        if (UNCHANGEABLE_CUSTOMER_ID.equals(id)) {
+            throw new BusinessException("Customer with ID %d can not be %s.".formatted(UNCHANGEABLE_CUSTOMER_ID, operation));
+        }
+    }
 
 }
