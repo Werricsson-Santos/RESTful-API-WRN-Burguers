@@ -63,9 +63,9 @@ public class CustomerController {
 	}
 	
 	@PutMapping("/{id}")
-    public ResponseEntity<Customer> update(@PathVariable(value = "id") Long id, @RequestBody Customer customerToUpdate) {
+    public ResponseEntity<CustomerDTO> update(@PathVariable(value = "id") Long id, @RequestBody Customer customerToUpdate) {
         var customer = this.customerService.update(id, customerToUpdate);
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(new CustomerDTO(customer));
     }
 	
 	@DeleteMapping("/{id}")
